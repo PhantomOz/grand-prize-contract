@@ -60,7 +60,7 @@ describe("GrandPrize", function(){
         });
         it("Should revert with TimeTooClose", async function() {
             const {grandPrize} = await loadFixture(deployGrandPrize);
-            const closeTime = Math.round(Date.now() / 1000);
+            const closeTime = await time.latestBlock();
             await expect(grandPrize.createActivity("This Task is to credit account with 5Eth", 0, 5, 5000, 0, closeTime, 3)).to
                 .be.revertedWithCustomError(grandPrize, "GrandPrize__TimeTooClose");
         });
@@ -70,6 +70,50 @@ describe("GrandPrize", function(){
             const closeTime = currentTimestampInSeconds + 60;
             await expect(grandPrize.createActivity("This Task is to credit account with 5Eth", 0, 5, 5000, 0, closeTime, 0)).to
                 .be.revertedWithCustomError(grandPrize, "GrandPrize__WinnersMustBeGreaterThanOne");
+        });
+    });
+
+    describe("joinActivity", function(){
+        it("Should allow particant join activity", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await expect(await grandPrize.connect(secondAccount).joinActivity(0)).to.emit(grandPrize, "JoinedActivity").withArgs(secondAccount.address, 0, 0);
+        });
+        it("Should not allow non participant", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await expect(grandPrize.joinActivity(0)).to.be.revertedWithCustomError(grandPrize, "GrandPrize__NotAParticipant");
+        });
+        it("Should revert if index is out of bound", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await expect(grandPrize.connect(secondAccount).joinActivity(1)).to.be.revertedWithCustomError(grandPrize, "GrandPrize__IndexOutOfBounds");
+        });
+        it("Should revert participant already Joined", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await grandPrize.connect(secondAccount).joinActivity(0);
+            await expect(grandPrize.connect(secondAccount).joinActivity(0)).to.be.revertedWithCustomError(grandPrize, "GrandPrize__AlreadyJoinedActivity");
+        });
+        it("Should revert if entryfee not met", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 1, 5, 5000, 0, closeTime, 3);
+            await expect(grandPrize.connect(secondAccount).joinActivity(0)).to.be.revertedWithCustomError(grandPrize, "GrandPrize__InsufficientEntryFee");
         });
     });
 });

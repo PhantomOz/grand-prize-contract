@@ -99,10 +99,10 @@ contract GrandPrize {
     /// @notice This allows users to join any activity
     /// @param _activityIndex a parameter for the index of the activty you want to join
     function joinActivity(uint256 _activityIndex) external payable {
-        if(s_isParticipant[msg.sender]){
+        if(!s_isParticipant[msg.sender]){
             revert GrandPrize__NotAParticipant();
         }
-        if(_activityIndex > s_activities.length){
+        if(_activityIndex >= s_activities.length){
             revert GrandPrize__IndexOutOfBounds();
         }
         if(s_joinedActivity[_activityIndex][msg.sender]){
@@ -111,7 +111,7 @@ contract GrandPrize {
         if(s_activities[_activityIndex]._entryFee > msg.value){
             revert GrandPrize__InsufficientEntryFee();
         }
-        s_joinedActivity[s_activities][msg.sender] = true;
+        s_joinedActivity[_activityIndex][msg.sender] = true;
         s_activityToEntryFeesBalance[_activityIndex] += msg.value;
         emit JoinedActivity(msg.sender, msg.value, _activityIndex);
     }
