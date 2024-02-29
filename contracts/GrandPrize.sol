@@ -11,6 +11,7 @@ error GrandPrize__WinnersMustBeGreaterThanOne();
 error GrandPrize__IndexOutOfBounds();
 error GrandPrize__AlreadyJoinedActivity();
 error GrandPrize__InsufficientEntryFee();
+error GrandPrize__NotAParticipant();
 
 /// @title Grand Prize
 /// @author Favour Aniogor
@@ -32,7 +33,11 @@ contract GrandPrize {
     /// @param _entryFee amount needed to join the activity
     /// @param _closeTime when the activity closes
     event NewActivity(address indexed _author, uint256 _prizePool, uint256 _maxWinners, uint256 _entryFee, uint256 _closeTime);
-    
+    /// @notice This event to be emitted when a participant joins an activity
+    /// @param _participant the address that joined the activity
+    /// @param _entryFee the amount paid to join the activity
+    /// @param _activityIndex the index of the activity joined
+    event JoinedActivity(address indexed _participant, uint256 _entryFee, uint256 indexed _activityIndex);
 
     /// @notice This the datatype for activity type
     enum ActivityType {
@@ -91,18 +96,24 @@ contract GrandPrize {
         emit NewActivity(msg.sender, _prizePool, _maxWinners, _entryFee, _closeTime);
     }
 
+    /// @notice This allows users to join any activity
+    /// @param _activityIndex a parameter for the index of the activty you want to join
     function joinActivity(uint256 _activityIndex) external payable {
+        if(s_isParticipant[msg.sender]){
+            revert GrandPrize__NotAParticipant();
+        }
         if(_activityIndex > s_activities.length){
             revert GrandPrize__IndexOutOfBounds();
         }
         if(s_joinedActivity[_activityIndex][msg.sender]){
             revert GrandPrize__AlreadyJoinedActivity();
         }
-        if(s_activities > msg.value){
+        if(s_activities[_activityIndex]._entryFee > msg.value){
             revert GrandPrize__InsufficientEntryFee();
         }
         s_joinedActivity[s_activities][msg.sender] = true;
         s_activityToEntryFeesBalance[_activityIndex] += msg.value;
+        emit JoinedActivity(msg.sender, msg.value, _activityIndex);
     }
 
 }
