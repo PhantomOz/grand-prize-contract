@@ -8,6 +8,9 @@ error GrandPrize__GameValueOnlyForGameType();
 error GrandPrize__PrizePoolTooLow();
 error GrandPrize__TimeTooClose();
 error GrandPrize__WinnersMustBeGreaterThanOne();
+error GrandPrize__IndexOutOfBounds();
+error GrandPrize__AlreadyJoinedActivity();
+error GrandPrize__InsufficientEntryFee();
 
 /// @title Grand Prize
 /// @author Favour Aniogor
@@ -16,8 +19,10 @@ error GrandPrize__WinnersMustBeGreaterThanOne();
 contract GrandPrize {
     uint256 public s_totalParticipants;
     mapping(address => bool) private s_isParticipant;
-    Activity[] public s_activities;
     mapping(uint256 => mapping(address => bool)) private s_submittedIndividuals;
+    mapping(uint256 => mapping(address => bool)) private s_joinedActivity;
+    mapping(uint256 => uint256) private s_activityToEntryFeesBalance;
+    Activity[] public s_activities;
 
     /// events
     /// @notice This event to be emitted when a new activity is created
@@ -84,6 +89,20 @@ contract GrandPrize {
         }
         s_activities.push(Activity(_task, _entryFee, _gameValue, _prizePool, _activityType, 0, _closeTime, msg.sender, _maxWinners));
         emit NewActivity(msg.sender, _prizePool, _maxWinners, _entryFee, _closeTime);
+    }
+
+    function joinActivity(uint256 _activityIndex) external payable {
+        if(_activityIndex > s_activities.length){
+            revert GrandPrize__IndexOutOfBounds();
+        }
+        if(s_joinedActivity[_activityIndex][msg.sender]){
+            revert GrandPrize__AlreadyJoinedActivity();
+        }
+        if(s_activities > msg.value){
+            revert GrandPrize__InsufficientEntryFee();
+        }
+        s_joinedActivity[s_activities][msg.sender] = true;
+        s_activityToEntryFeesBalance[_activityIndex] += msg.value;
     }
 
 }
