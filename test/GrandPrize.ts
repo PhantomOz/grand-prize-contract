@@ -116,4 +116,52 @@ describe("GrandPrize", function(){
             await expect(grandPrize.connect(secondAccount).joinActivity(0)).to.be.revertedWithCustomError(grandPrize, "GrandPrize__InsufficientEntryFee");
         });
     });
+
+    describe("SubmitEntry", function(){
+        it("Should allow particant submit entry", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await grandPrize.connect(secondAccount).joinActivity(0);
+            await expect(await grandPrize.connect(secondAccount).submitEntry(0, "This task is easy", {value: 5000})).to.emit(grandPrize, "EntrySubmitted").withArgs(secondAccount.address, 0, 5000);
+        });
+        it("Should revert if index is out of bounds", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await grandPrize.connect(secondAccount).joinActivity(0);
+            await expect(grandPrize.connect(secondAccount).submitEntry(1, "This task is easy", {value: 5})).to.be.revertedWithCustomError(grandPrize, "GrandPrize__IndexOutOfBounds");
+        });
+        it("Should revert address is not participant", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await grandPrize.connect(secondAccount).joinActivity(0);
+            await expect(grandPrize.submitEntry(0, "This task is easy", {value: 5000})).to.be.revertedWithCustomError(grandPrize, "GrandPrize__NotJoinedActivity");
+        });
+        it("Should revert if task length is short", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 0, 5000, 1, closeTime, 3);
+            await grandPrize.connect(secondAccount).joinActivity(0);
+            await expect(grandPrize.connect(secondAccount).submitEntry(0, "Thi", {value: 5000})).to.be.revertedWithCustomError(grandPrize, "GrandPrize__TaskLengthTooShort");
+        });
+        it("Should revert if gameValue is low", async function(){
+            const {grandPrize, secondAccount} = await loadFixture(deployGrandPrize);
+            const currentTimestampInSeconds = Math.round(Date.now() / 1000);
+            const closeTime = currentTimestampInSeconds + 60;
+            await grandPrize.connect(secondAccount).registerAsParticipant();
+            await grandPrize.createActivity("This Task is to credit account with 5 Eth", 0, 5, 5000, 0, closeTime, 3);
+            await grandPrize.connect(secondAccount).joinActivity(0);
+            await expect(grandPrize.connect(secondAccount).submitEntry(0, "Thi", {value: 4})).to.be.revertedWithCustomError(grandPrize, "GrandPrize__GameValueTooLow");
+        });
+    });
 });

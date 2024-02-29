@@ -99,7 +99,7 @@ contract GrandPrize {
         if(_maxWinners < 1){
             revert GrandPrize__WinnersMustBeGreaterThanOne();
         }
-        s_activities.push(Activity(_task, _entryFee, _gameValue, _prizePool, _activityType, 0, _closeTime, msg.sender, _maxWinners));
+        s_activities.push(Activity(_task, _entryFee, _prizePool, _gameValue, _activityType, 0, _closeTime, msg.sender, _maxWinners));
         emit NewActivity(msg.sender, _prizePool, _maxWinners, _entryFee, _closeTime);
     }
 
@@ -133,7 +133,7 @@ contract GrandPrize {
         if(!s_joinedActivity[_activityIndex][msg.sender]){
             revert GrandPrize__NotJoinedActivity();
         }
-        if(s_activities[_activityIndex]._activityIndex == ActivityType.Content && bytes(_taskUri).length < 5){
+        if(s_activities[_activityIndex]._activityType == ActivityType.Content && bytes(_taskUri).length < 5){
             revert GrandPrize__TaskLengthTooShort();
         } 
         if(s_activities[_activityIndex]._gameValue > msg.value){
