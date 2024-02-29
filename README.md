@@ -10,23 +10,22 @@ This is a smart contract that facilitates a decentralized prize distribution sys
 
 - **Entry Generation**: Upon successful completion of the activity, participants should receive a certain number of entries into the prize distribution system. The number of entries earned may vary based on the participant's level of participation or achievement in the activity.
 
-- Prize Distribution: After a specified period of time or when a predetermined condition is met (e.g., a certain number of entries is reached), the contract should trigger a prize distribution event.
+- **Prize Distribution**: After a specified period of time or when a predetermined condition is met (e.g., a certain number of entries is reached), the contract should trigger a prize distribution event.
 
-- Random Winner Selection: The prize distribution event should use Chainlink VRF to generate a random number, which will be used to select the winners from the pool of participants. The number of winners and the distribution of prizes should be configurable.
+- **Random Winner Selectio**n: The prize distribution event should use Chainlink VRF to generate a random number, which will be used to select the winners from the pool of participants. The number of winners and the distribution of prizes should be configurable.
 
-- Airdrop Reward Calculation: Once the winners are selected, the smart contract should calculate the amount of ERC20 tokens each winner will receive as an airdrop reward. The calculation may take into account factors such as the total prize pool, the number of entries earned by each winner, and any other relevant criteria.
+- **Airdrop Reward Calculation**: Once the winners are selected, the smart contract should calculate the amount of ERC20 tokens each winner will receive as an airdrop reward. The calculation may take into account factors such as the total prize pool, the number of entries earned by each winner, and any other relevant criteria.
 
-- Airdrop Token Distribution: After calculating the airdrop rewards for each winner, the contract should distribute the ERC20 tokens to their respective addresses. Gas-efficient and secure methods should be used for token distribution to minimize costs and ensure security.
+- **Airdrop Token Distribution**: After calculating the airdrop rewards for each winner, the contract should distribute the ERC20 tokens to their respective addresses. Gas-efficient and secure methods should be used for token distribution to minimize costs and ensure security.
 
-- Event Logging and Transparency: Emit events for each step of the prize distribution process to provide transparency and allow participants to verify the fairness of the distribution. Events should include information such as the winners' addresses, the amount of tokens received, and any relevant details about the distribution event.
+- **Event Logging and Transparency**: Emit events for each step of the prize distribution process to provide transparency and allow participants to verify the fairness of the distribution. Events should include information such as the winners' addresses, the amount of tokens received, and any relevant details about the distribution event.
 
-Implementation
+### Implementation
 
-- Integrate Chainlink VRF to generate random numbers for selecting winners in the prize distribution event.
-- Implement gas-efficient and secure methods for calculating and distributing ERC20 tokens as airdrop rewards.
-- Ensure proper error handling and security measures are in place to prevent unauthorized access or manipulation of the distribution process.
+- Integrated Chainlink VRF to generate random numbers for selecting winners in the prize distribution event.
+- Implemented gas-efficient and secure methods for calculating and distributing ERC20 tokens as airdrop rewards.
+- Ensured proper error handling and security measures are in place to prevent unauthorized access or manipulation of the distribution process.
 
-—-
+### Deployment
 
-- Design and implement the smart contract with all the features listed above, ensuring correctness, efficiency, and security.
-- Add proper comments to the smart contract explaining what each function does.
+###### This contract is deployed and verified on Sepolia and its contract address: [0xE57d7766b7D3c0283138E1CABC429D5993CAEe2f](https://sepolia.etherscan.io/address/0xE57d7766b7D3c0283138E1CABC429D5993CAEe2f#code)

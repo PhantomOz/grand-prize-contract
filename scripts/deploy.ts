@@ -4,7 +4,7 @@ async function main() {
   const KEYHASH =
     "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c";
   const SUBSCRIPTION_ID = 0; //add your own subscription id
-  const CALLBACK_GAS_LIMT = 5000;
+  const CALLBACK_GAS_LIMT = 50000;
   const VRFCOORDINATOR = "0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625";
   const TOKEN_NAME = "Grand Prize Token";
   const TOKEN_SYMBOL = "GPT";

@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {ERC20Token} from "./ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 // errors
 error GrandPrize__AlreadyAParticipant();
@@ -25,7 +26,7 @@ error GrandPrize__ActivityNoLongerOpen();
 /// @author Favour Aniogor
 /// @notice This is responsible for selecting random winners and dissing out airdrop
 /// @dev This uses chainlink VRF to generate random numbers and select winners
-contract GrandPrize is VRFConsumerBaseV2 {
+contract GrandPrize is VRFConsumerBaseV2, Ownable {
     bytes32 private immutable i_keyHash;
     uint64 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
@@ -95,9 +96,9 @@ contract GrandPrize is VRFConsumerBaseV2 {
         ActivityStatus _status;
     }
 
-    /// @notice Explain to an end user what this does
-    /// @param _keyHash a parameter just like in doxygen (must be followed by parameter name)
-    constructor(bytes32 _keyHash, uint64 _subscriptionId, uint32 _callbackGasLimit, address _vrfCoordinator, string memory _name, string memory _symbol, uint8 _decimal, uint256 _totalSupply) VRFConsumerBaseV2(_vrfCoordinator){
+    /// @notice Setting contract on deployment
+    /// @param _keyHash used by 
+    constructor(bytes32 _keyHash, uint64 _subscriptionId, uint32 _callbackGasLimit, address _vrfCoordinator, string memory _name, string memory _symbol, uint8 _decimal, uint256 _totalSupply) VRFConsumerBaseV2(_vrfCoordinator) Ownable(msg.sender){
         i_keyHash = _keyHash;
         i_subscriptionId = _subscriptionId;
         i_callbackGasLimit = _callbackGasLimit;
@@ -123,7 +124,7 @@ contract GrandPrize is VRFConsumerBaseV2 {
     /// @param _activityType a parameter for the category the activity falls under.
     /// @param _closeTime a parameter for when the activity closes.
     /// @param _maxWinners a parameter the amount of winners the activity should have.
-    function createActivity(string memory _task, uint256 _entryFee, uint256 _gameValue, uint256 _prizePool, ActivityType _activityType, uint256 _closeTime, uint256 _maxWinners) external {
+    function createActivity(string memory _task, uint256 _entryFee, uint256 _gameValue, uint256 _prizePool, ActivityType _activityType, uint256 _closeTime, uint256 _maxWinners) external onlyOwner {
         if(bytes(_task).length < 5){
             revert GrandPrize__TaskLengthTooShort();
         }
