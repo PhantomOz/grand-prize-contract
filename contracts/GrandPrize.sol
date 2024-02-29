@@ -9,6 +9,7 @@ error GrandPrize__AlreadyAParticipant();
 /// @notice This is responsible for selecting random winners and dissing out airdrop
 /// @dev This uses chainlink VRF to generate random numbers and select winners
 contract GrandPrize {
+    uint256 public s_totalParticipants;
     mapping(address => bool) private s_isParticipant;
 
     /// @notice This allows user to register as Participant in the GrandPrize system
@@ -18,6 +19,7 @@ contract GrandPrize {
             revert GrandPrize__AlreadyAParticipant();
         }
         s_isParticipant[msg.sender] = true;
+        s_totalParticipants++;
     }
 
 }
