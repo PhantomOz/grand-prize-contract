@@ -6,7 +6,7 @@ This is a smart contract that facilitates a decentralized prize distribution sys
 
 - **Participant Registration**: Users should be able to register as participants in the prize distribution system by interacting with the smart contract.
 
-- Activity Participation: Participants should engage in a specific activity or game, such as completing a task, playing a game, or submitting a piece of content, to earn entries into the prize distribution.
+- **Activity Participation**: Participants should engage in a specific activity or game, such as completing a task, playing a game, or submitting a piece of content, to earn entries into the prize distribution.
 
 - Entry Generation: Upon successful completion of the activity, participants should receive a certain number of entries into the prize distribution system. The number of entries earned may vary based on the participant's level of participation or achievement in the activity.
 

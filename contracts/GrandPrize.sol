@@ -12,6 +12,8 @@ error GrandPrize__IndexOutOfBounds();
 error GrandPrize__AlreadyJoinedActivity();
 error GrandPrize__InsufficientEntryFee();
 error GrandPrize__NotAParticipant();
+error GrandPrize__NotJoinedActivity();
+error GrandPrize__GameValueTooLow();
 
 /// @title Grand Prize
 /// @author Favour Aniogor
@@ -38,6 +40,11 @@ contract GrandPrize {
     /// @param _entryFee the amount paid to join the activity
     /// @param _activityIndex the index of the activity joined
     event JoinedActivity(address indexed _participant, uint256 _entryFee, uint256 indexed _activityIndex);
+    /// @notice This event to be emitted when a participant submits an entry for an activity
+    /// @param _participant the address that submitted the entry for the activity
+    /// @param _activityIndex the index of the activity the participant submitted entry for
+    /// @param _gameValue the amount the _participant paid for a valid entry
+    event EntrySubmitted(address indexed _participant,uint256 indexed _activityIndex, uint256 _gameValue);
 
     /// @notice This the datatype for activity type
     enum ActivityType {
@@ -114,6 +121,26 @@ contract GrandPrize {
         s_joinedActivity[_activityIndex][msg.sender] = true;
         s_activityToEntryFeesBalance[_activityIndex] += msg.value;
         emit JoinedActivity(msg.sender, msg.value, _activityIndex);
+    }
+
+    /// @notice This function allows a participant to submit entry for an activity
+    /// @param _activityIndex a parameter for the index of the activty you want submit entry for.
+    /// @param _taskUri a parameter for the task submission for the entry
+    function submitEntry(uint256 _activityIndex, string calldata _taskUri) external payable{
+        if(_activityIndex >= s_activities.length){
+            revert GrandPrize__IndexOutOfBounds();
+        }
+        if(!s_joinedActivity[_activityIndex][msg.sender]){
+            revert GrandPrize__NotJoinedActivity();
+        }
+        if(s_activities[_activityIndex]._activityIndex == ActivityType.Content && bytes(_taskUri).length < 5){
+            revert GrandPrize__TaskLengthTooShort();
+        } 
+        if(s_activities[_activityIndex]._gameValue > msg.value){
+            revert GrandPrize__GameValueTooLow();
+        }
+        s_submittedIndividuals[_activityIndex][msg.sender] = true;
+        emit EntrySubmitted(msg.sender, _activityIndex, msg.value);
     }
 
 }
