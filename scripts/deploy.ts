@@ -1,22 +1,30 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const KEYHASH =
+    "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c";
+  const SUBSCRIPTION_ID = 0; //add your own subscription id
+  const CALLBACK_GAS_LIMT = 5000;
+  const VRFCOORDINATOR = "0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625";
+  const TOKEN_NAME = "Grand Prize Token";
+  const TOKEN_SYMBOL = "GPT";
+  const TOTALSUPPLY = 1000000000000000;
+  const DECIMAL = 6;
 
-  const lockedAmount = ethers.parseEther("0.001");
+  const grandPrize = await ethers.deployContract("GrandPrize", [
+    KEYHASH,
+    SUBSCRIPTION_ID,
+    CALLBACK_GAS_LIMT,
+    VRFCOORDINATOR,
+    TOKEN_NAME,
+    TOKEN_SYMBOL,
+    DECIMAL,
+    TOTALSUPPLY,
+  ]);
 
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
+  await grandPrize.waitForDeployment();
 
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
+  console.log(`deployed to ${grandPrize.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

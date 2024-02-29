@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-
+import {ERC20Token} from "./ERC20.sol";
 
 // errors
 error GrandPrize__AlreadyAParticipant();
@@ -30,6 +30,7 @@ contract GrandPrize is VRFConsumerBaseV2 {
     uint64 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
+    ERC20Token private s_token;
     uint256 public s_totalParticipants;
     mapping(address => bool) private s_isParticipant;
     mapping(uint256 => mapping(address => bool)) private s_submittedIndividuals;
@@ -96,11 +97,12 @@ contract GrandPrize is VRFConsumerBaseV2 {
 
     /// @notice Explain to an end user what this does
     /// @param _keyHash a parameter just like in doxygen (must be followed by parameter name)
-    constructor(bytes32 _keyHash, uint64 _subscriptionId, uint32 _callbackGasLimit, address _vrfCoordinator) VRFConsumerBaseV2(_vrfCoordinator){
+    constructor(bytes32 _keyHash, uint64 _subscriptionId, uint32 _callbackGasLimit, address _vrfCoordinator, string memory _name, string memory _symbol, uint8 _decimal, uint256 _totalSupply) VRFConsumerBaseV2(_vrfCoordinator){
         i_keyHash = _keyHash;
         i_subscriptionId = _subscriptionId;
         i_callbackGasLimit = _callbackGasLimit;
         i_vrfCoordinator = VRFCoordinatorV2Interface(_vrfCoordinator);
+        s_token = new ERC20Token(_name, _symbol, _decimal, _totalSupply);
     }
 
     /// @notice This allows user to register as Participant in the GrandPrize system
@@ -231,12 +233,13 @@ contract GrandPrize is VRFConsumerBaseV2 {
         }else{
             _maxWinners = s_submittedAddresses[_activityId].length;
         }
+        uint256 _price = (s_activities[_activityId]._prizePool / _maxWinners);
 
         for(uint256 i = 0; i < _maxWinners; i++){
             uint256 indexOfWinner = _randomWords[0] % (s_submittedAddresses[_activityId].length - i);
             address winner = s_submittedAddresses[_activityId][indexOfWinner];
             s_activities[_activityId]._winners.push(winner);
-            //transfer Of erc20 Token
+            s_token.transfer(winner, _price);
             emit WinnerPicked(winner, _activityId);
         }
         s_activities[_activityId]._status = ActivityStatus.CLOSED;
