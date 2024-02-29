@@ -24,15 +24,15 @@ contract GrandPrize {
     /// @param _author the address that created the activity
     /// @param _prizePool total amount to the won
     /// @param _maxWinners the total amount of people that can win
-    /// @param _entryfee amount needed to join the activity
+    /// @param _entryFee amount needed to join the activity
     /// @param _closeTime when the activity closes
-    event NewActivity(address indexed _author, uint256 _prizepool, uint256 _maxWinners, uint256 _entryFee, uint256 _closeTime)
+    event NewActivity(address indexed _author, uint256 _prizePool, uint256 _maxWinners, uint256 _entryFee, uint256 _closeTime);
     
-    
+
     /// @notice This the datatype for activity type
     enum ActivityType {
-        Game;
-        Content;
+        Game,
+        Content
     }
     
     /// @notice This is the data structure for the activities
@@ -73,7 +73,7 @@ contract GrandPrize {
         if(_prizePool <= 0){
             revert GrandPrize__PrizePoolTooLow();
         }
-        if(_activityType != 0 && _gameValue > 0){
+        if(_activityType != ActivityType.Game && _gameValue > 0){
             revert GrandPrize__GameValueOnlyForGameType();
         }
         if(_closeTime <= block.timestamp){
@@ -83,7 +83,7 @@ contract GrandPrize {
             revert GrandPrize__WinnersMustBeGreaterThanOne();
         }
         s_activities.push(Activity(_task, _entryFee, _gameValue, _prizePool, _activityType, 0, _closeTime, msg.sender, _maxWinners));
-        emit NewActivity(msg.sender, _prizepool, _maxWinners, _entryFee, _closeTime);
+        emit NewActivity(msg.sender, _prizePool, _maxWinners, _entryFee, _closeTime);
     }
 
 }
