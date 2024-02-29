@@ -4,7 +4,7 @@ This is a smart contract that facilitates a decentralized prize distribution sys
 
 ### Features:
 
-- Participant Registration: Users should be able to register as participants in the prize distribution system by interacting with the smart contract.
+- **Participant Registration**: Users should be able to register as participants in the prize distribution system by interacting with the smart contract.
 
 - Activity Participation: Participants should engage in a specific activity or game, such as completing a task, playing a game, or submitting a piece of content, to earn entries into the prize distribution.
 
